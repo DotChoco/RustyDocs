@@ -4,5 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-strum = "0.24"
-strum_macros = "0.24"
+strum = "0.26"
+strum_macros = "0.26"
+chrono = "0.4"
+rand = "0.8"  

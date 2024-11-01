@@ -2,7 +2,7 @@ use strum_macros::{EnumString, AsRefStr};
 
 
 #[derive(EnumString, AsRefStr, PartialEq, Eq)]
-pub enum DFLAGS{
+pub enum DTAGS{
     NONE,
     H1,
     H2,
@@ -41,20 +41,20 @@ pub enum Cons {
     ADD = 43,
 }
 
-pub fn get_flag(word: String) -> DFLAGS {
-    if word == W_H1 {return DFLAGS::H1}
-    if word == W_H2 {return DFLAGS::H2}
-    if word == W_H3 {return DFLAGS::H3}
-    if word == W_H4 {return DFLAGS::H4}
-    if word == W_HLNK {return DFLAGS::HLNK}
-    if word == W_IMG {return DFLAGS::IMG}
-    if word == W_LNK {return DFLAGS::LNK}
-    if word == W_OL {return DFLAGS::OL}
-    if word == W_P {return DFLAGS::P}
-    if word == W_TAB {return DFLAGS::TAB}
-    if word == W_UOL {return DFLAGS::UOL}
-    if word == W_CMT {return DFLAGS::CMT}
-    DFLAGS::NONE
+pub fn get_flag(word: String) -> DTAGS {
+    if word == W_H1 {return DTAGS::H1}
+    if word == W_H2 {return DTAGS::H2}
+    if word == W_H3 {return DTAGS::H3}
+    if word == W_H4 {return DTAGS::H4}
+    if word == W_HLNK {return DTAGS::HLNK}
+    if word == W_IMG {return DTAGS::IMG}
+    if word == W_LNK {return DTAGS::LNK}
+    if word == W_OL {return DTAGS::OL}
+    if word == W_P {return DTAGS::P}
+    if word == W_TAB {return DTAGS::TAB}
+    if word == W_UOL {return DTAGS::UOL}
+    if word == W_CMT {return DTAGS::CMT}
+    DTAGS::NONE
 }
 
 
@@ -78,5 +78,5 @@ pub const W_CT:&str = "</";
 pub const L_OTEM:&str = stringify!(<!DOCTYPE html><html lang="en">
     <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title></head><body>);
-        
+
 pub const L_CTEM:&str = stringify!(</body></html>);

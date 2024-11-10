@@ -1,0 +1,1 @@
+pub mod rsdocs_config;

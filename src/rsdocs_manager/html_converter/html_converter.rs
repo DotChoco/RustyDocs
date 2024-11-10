@@ -1,6 +1,3 @@
-
-use std::fs::read_to_string;
-
 pub struct HTMLConverter{
     vault_path:String,
     items:Vec<(String, String)>

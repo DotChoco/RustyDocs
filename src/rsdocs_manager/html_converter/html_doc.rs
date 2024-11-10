@@ -1,23 +1,18 @@
-use crate::html_converter::cons;
-
-use super::cons::*;
+use super::html_cons::{self, *};
 use std::fs::read_to_string;
 
 pub struct HTMLDoc{
     file_path:String,
     flags:Vec<(DTAGS, String)>,
-    id:String
 }
 
 impl HTMLDoc {
     
     pub fn new(file_path:String)->HTMLDoc{
         let flags:Vec<(DTAGS, String)> = Vec::new();
-        let id = String::new();
         HTMLDoc{
             file_path,
             flags,
-            id
         }
     }
 
@@ -78,7 +73,7 @@ impl HTMLDoc {
                     word += letter.to_string().as_str();
                 }
                 else {
-                    if cons::get_flag(word.clone()) != DTAGS::NONE {
+                    if html_cons::get_flag(word.clone()) != DTAGS::NONE {
                         self.data_flag(line, index, word.clone());
                         break;
                     }
@@ -99,7 +94,7 @@ impl HTMLDoc {
             data += item.1.to_string().as_str();
         }
 
-        self.flags.push((cons::get_flag(word.clone()), data.clone()));
+        self.flags.push((html_cons::get_flag(word.clone()), data.clone()));
 
         // println!("+{}+:**{}**", cons::get_flag(word.clone()).as_ref(), data);
     }

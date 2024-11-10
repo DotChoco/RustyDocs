@@ -1,4 +1,4 @@
-use std::fs;
+use std::{default, fs, path::Path};
 
 use super::{ config_rsf::rsdocs_config::*, doc_files::rusty_file::*, server_rsdocs::rs_server_cons::* };
 
@@ -12,49 +12,60 @@ impl RsDocsManger {
     
     pub fn new() -> RsDocsManger{
         let rs_conf = RsDocsConfig::new();
-        
         RsDocsManger { rs_conf }
     }
 
 
-    pub fn init(&mut self, vault_path:String) {
-        self.rs_conf.load_config_file(vault_path);
+    pub fn init(&mut self, vault_path:String)->bool{
+        if Path::new(vault_path.as_str()).exists() {
+            self.rs_conf.load_config_file(vault_path);
+            return true;
+        }
+        false
     }
 
 
-    pub fn add_new_file(&mut self, folder_path:String){
-        let mut _def_path = String::new();
-        let mut rusty_file = RustyFile::new();
-
-        if folder_path == String::new() ||
-            folder_path == DEFAULT_RELATIVE_PATH.to_string() {
-            _def_path = format!("{}{}",self.rs_conf.get_vault_path(), DEFAULT_RELATIVE_PATH);
-        } else {
-            _def_path = format!("{}{}{}",self.rs_conf.get_vault_path(), DEFAULT_RELATIVE_PATH, folder_path);
+    pub fn add_new_file(&mut self, vault:String,
+        mut _folder_path:String, mut _name:String)->String{
+        let path = format!("{}{}", vault,_folder_path);
+        
+        if !Path::new(path.as_str()).exists() {
+            return RsSErrorLogs::SE03.as_ref().to_string();
         }
+        println!("{}", path);
+
+        let mut _relative_path = String::new();
+        let mut rusty_file = RustyFile::new();
         
+        
+        //Make Folder Path
+        if _folder_path == String::new() 
+        || _folder_path == DEFAULT_RELATIVE_PATH.to_string() {
+            _relative_path = format!("{}", DEFAULT_RELATIVE_PATH);
+        } else {
+            _relative_path = format!("{}{}", _folder_path, DEFAULT_RELATIVE_PATH);
+        }
+
         //File Creation
-        rusty_file.create(_def_path.as_str(),self.rs_conf.get_ids());
-        
-        //Get FileName
-        let mut _rsf_path_trimed:Vec<&str> = rusty_file.path.split('/').collect();
-        let rsf_name = _rsf_path_trimed
-                                    .get(_rsf_path_trimed.len() - 1)
-                                    .unwrap();
+        rusty_file.create(_name.clone(),
+                    _relative_path.as_str(),
+                    self.rs_conf.get_vault_path(),
+                        self.rs_conf.get_ids());
         
 
         //Add the new file to path list
-        let mut new_path =RSDocsPaths::new(); 
+        let mut new_path = RSDocsPaths::new(); 
         
         new_path.id = rusty_file.id;
         new_path.relative_path = format!("{}{}", 
-                    DEFAULT_RELATIVE_PATH.to_string(),
-                    (*rsf_name).to_string());
+                    _folder_path,
+                    _name);
         
         self.rs_conf.file_paths.push(new_path);
         
         //Overwrite config file
         self.rs_conf.write_content();
+        return RsSSuccesLogs::S03.as_ref().to_string();
     }
 
 
@@ -81,10 +92,12 @@ impl RsDocsManger {
             },
             Err(e) => {
                 eprintln!("Error al crear la carpeta: {}", e);
-                return RsSErrorLogs::SE01.as_ref().to_string();
+                return RsSErrorLogs::SE02.as_ref().to_string();
             },
         }
     }
+
+
 }
 
 

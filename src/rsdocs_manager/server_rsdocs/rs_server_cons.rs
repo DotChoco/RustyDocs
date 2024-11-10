@@ -31,12 +31,19 @@ pub enum RsSErrorLogs {
     SE00, //SE = Server Error
     SE01,
     SE02,
+    SE03,
+    SE04,
+    SE05,
 }
 #[derive(EnumString, AsRefStr, PartialEq, EnumIter)]
 pub enum RsSSuccesLogs {
     SS00, //SS = Server Success
     S01,
     S02,
+    S03,
+    S04,
+    S05,
+    S06,
 }
 
 

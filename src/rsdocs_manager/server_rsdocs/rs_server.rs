@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
-use crate::rsdocs_manager::rsdocs_manager::RsDocsManger;
+use crate::rsdocs_manager::{config_rsf::rsdocs_config::DEFAULT_RELATIVE_PATH, rsdocs_manager::RsDocsManger};
 use super::rs_server_cons::*;
 
 
@@ -40,46 +40,55 @@ impl RsCRequest {
 
 
     pub fn run_action(&mut self, json:String) -> RsSResponse{
-        let mut rss_response = RsSResponse::new();
-        println!("{}", json);
-
-        // Deserialize JSON
-        let request:RsCRequest = serde_json::from_str(json.as_str()).unwrap();
-        
-        self.auto_fill(&request);
-        
-        if !self.action_exists(&request.action){
-            rss_response.body = String::new();
-            rss_response.log = RsSErrorLogs::SE00.as_ref().to_string();
-        } else {
-            rss_response = self.exec_action(request);
-        }
-
-        rss_response
-    }
-
-    fn exec_action(&mut self, request:RsCRequest) ->RsSResponse{
         let mut rss_response: RsSResponse = RsSResponse::new();
         let mut doc_manager = RsDocsManger::new();
+        println!("{}", json);
+        // Deserialize JSON
+        let request:RsCRequest = serde_json::from_str(json.as_str()).unwrap();
+        self.auto_fill(&request);
+        
+        if !doc_manager.init(request.path.clone()) {
+            
+            rss_response.log = RsSErrorLogs::SE01.as_ref().to_string();
+            return rss_response;
+        }
+
+        let destination_path:String = format!("{}{}",request.path,request.body);
         match request.action.as_str() {
             AW_LV => {
-                doc_manager.init(request.path);
+                rss_response.log = RsSSuccesLogs::SS00.as_ref().to_string();
                 let body = serde_json::to_string(&doc_manager.rs_conf.file_paths).unwrap();
                 rss_response.body = body;
-                rss_response.log = RsSSuccesLogs::SS00.as_ref().to_string();
             },
             AW_CF => {
-                let path:String = format!("{}/{}",request.path,request.body);
-                rss_response.log = doc_manager.create_folder(path.clone());
-                if self.is_success_log(rss_response.log.as_str()) {
-                    rss_response.body = path;
-                }
+                rss_response.log = doc_manager.create_folder(destination_path.clone());
             },
-            _ =>{}
+            AW_CRSF =>{
+                //Get FileName
+                let mut _rsf_path_trimed:Vec<&str> = request.body.split('/').collect();
+                let rsf_name = _rsf_path_trimed
+                                            .get(_rsf_path_trimed.len() - 1)
+                                            .unwrap();
+                let _name = rsf_name.to_string();
+                let mut _relative_path = String::new();
+                
+                if _rsf_path_trimed.len() > 2 {
+                    _relative_path = _rsf_path_trimed.remove(_rsf_path_trimed.len() - 1).to_string();
+                }else {
+                    _relative_path = format!("{}",DEFAULT_RELATIVE_PATH);
+                }
+                
+                rss_response.log = doc_manager.add_new_file(request.path.clone(),_relative_path, _name);
+            }
+            _ =>{ rss_response.log = RsSErrorLogs::SE00.as_ref().to_string();
+                rss_response.body = String::new();}
+        }
+
+        if self.is_success_log(rss_response.log.as_str()) {
+            rss_response.body = destination_path;
         }
         rss_response
     }
-
 
 
     fn auto_fill(&mut self, request:&RsCRequest){
@@ -92,8 +101,9 @@ impl RsCRequest {
     
     pub fn action_exists(&mut self, action:&str) -> bool {
         matches!(action, AW_CV | AW_CRSF| AW_HTMLC 
-                | AW_LV | AW_PDFC | AW_RRSF| AW_CF| 
-                AW_CRSF | AW_DF)
+                | AW_LV | AW_PDFC | AW_RRSF| AW_CF
+                | AW_DF | AW_UV | AW_DRSF | AW_URSF 
+                | AW_UFN )
     }
 
 
@@ -109,6 +119,7 @@ impl RsCRequest {
         _http_code
     }
 
+    
     fn is_success_log(&mut self, log:&str)-> bool {
         let is_success = RsSSuccesLogs::iter()
             .any(|rss_sl| rss_sl.as_ref() == log);

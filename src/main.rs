@@ -10,10 +10,9 @@ use rsdocs_manager::server_rsdocs::rs_server::*;
 //RustyDocs Mods
 mod rsdocs_manager;
 
-
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-
+    
     //Open the port and set the ip that use to listen
     let listener = TcpListener::bind("127.0.0.1:8080").await?;
     

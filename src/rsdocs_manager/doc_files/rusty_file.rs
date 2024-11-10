@@ -66,20 +66,25 @@ impl RustyFile {
     }
 
 
-    pub fn create(&mut self, folder_path:&str, 
-        files:Vec<String>){
-
+    pub fn create(&mut self, mut file_name:String ,relative_path:&str, 
+        vault_path:String, files:Vec<String>){
+        
         self.id = RustyHashser::new().make_hash();
-        if self.path == String::new() {
-            self.path = FILE_DEFAULT_NAME.to_string();
-            self.path += &self.id.clone()[self.id.len() - 12..];
+        if file_name == String::new() {
+            if self.path == String::new() {
+                file_name = FILE_DEFAULT_NAME.to_string();
+                file_name += &self.id.clone()[self.id.len() - 12..];
+            }
         }
-
-        //Get path
-        self.path = format!("{}{}",folder_path, self.path);
-        let full_path = format!("{}{}",self.path, RSFILE_EXTENSION);
+        
+        
+        //Concat path
+        self.path = format!("{}{}", vault_path, relative_path);
+        let full_path = format!("{}{}{}", self.path, file_name, RSFILE_EXTENSION);
         let path = Path::new(full_path.as_str());
         
+        println!("{}", path.to_str().unwrap());
+
         //Check if the id actually exists
         let mut exist_id = false;
         if files != Vec::<String>::new() {
@@ -91,13 +96,13 @@ impl RustyFile {
         if !path.exists() && !exist_id {
             let _ = self.write_data(full_path, 
                 self.path.clone(),
-                    String::new());
+                file_name);
         }
     }
 
 
     fn write_data(&mut self, full_path:String, 
-        path:String, content:String)-> Result<()> {
+        path:String, rsf_title:String)-> Result<()> {
 
         let mut file = OpenOptions::new()
         .write(true)
@@ -106,11 +111,7 @@ impl RustyFile {
         .open(full_path.as_str())?;
         
         let mut _file_content = String::new();
-        if content == String::new() {
-            _file_content = format!(".H1 {}", path);
-        }else {
-            _file_content = format!(".H1 {}\n{}", path, content);
-        }
+        _file_content = format!(".H1 {}", rsf_title);
 
         file.write_all(_file_content.as_bytes())?;
 

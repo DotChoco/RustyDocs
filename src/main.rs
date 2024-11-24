@@ -5,10 +5,13 @@ use std::sync::{Arc, atomic::{AtomicBool, Ordering}};
 use tokio::sync::Notify;
 
 //RustyDocs Imports
-use rsdocs_manager::server_rsdocs::rs_server::*;
+use server_rsdocs::rs_server::RsCRequest;
 
 //RustyDocs Mods
 mod rsdocs_manager;
+mod server_rsdocs;
+mod config_rsf;
+mod doc_files;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -51,7 +54,7 @@ async fn main() -> std::io::Result<()> {
                                 let body = get_body(req_lines.clone());
                                 
                                 // Shutdown server if the json contains the "SHUTDOWN" action
-                                if body.contains("\"action\":\"SD\"") {
+                                if body.contains("\"action\": \"SD\"") {
                                     println!("Server Shutdown");
                                     shutdown_signal.store(true, Ordering::Relaxed);
                                     shutdown_notify.notify_one();
@@ -84,9 +87,12 @@ async fn main() -> std::io::Result<()> {
 
 fn get_verbose(req_lines:Vec<&str>, index:usize)->String{
     let _req_verbose = *(req_lines.get(index).unwrap());
+    
     let _req_verbose_vec:Vec<&str> = _req_verbose.split('/').collect();
+    
     let verbose:String = (_req_verbose_vec.get(index).unwrap())
                                         .to_string().replace(" ", "");
+    
     verbose
 }
 

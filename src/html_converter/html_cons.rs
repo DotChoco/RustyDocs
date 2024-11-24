@@ -75,6 +75,7 @@ pub const W_CCMT:&str = " -->";
 pub const W_OT:&str = "<";
 pub const W_CT:&str = "</";
 
+
 pub const L_OTEM:&str = stringify!(<!DOCTYPE html><html lang="en">
     <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title></head><body>);

@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
-use crate::rsdocs_manager::{config_rsf::rsdocs_config::DEFAULT_RELATIVE_PATH, rsdocs_manager::RsDocsManger};
+use crate::rsdocs_manager::RsDocsManger;
+use crate::config_rsf::rsdocs_config::DEFAULT_RELATIVE_PATH;
 use super::rs_server_cons::*;
 
 
@@ -43,8 +44,9 @@ impl RsCRequest {
         let mut rss_response: RsSResponse = RsSResponse::new();
         let mut doc_manager = RsDocsManger::new();
         println!("{}", json);
+        
         // Deserialize JSON
-        let request:RsCRequest = serde_json::from_str(json.as_str()).unwrap();
+        let request:RsCRequest = serde_json::from_str(&json).unwrap();
         self.auto_fill(&request);
         
         if !doc_manager.init(request.path.clone()) {
@@ -53,7 +55,7 @@ impl RsCRequest {
             return rss_response;
         }
 
-        let destination_path:String = format!("{}{}",request.path,request.body);
+        let destination_path:String = format!("{}{}",request.path, request.body);
         match request.action.as_str() {
             AW_LV => {
                 rss_response.log = RsSSuccesLogs::SS00.as_ref().to_string();
@@ -84,9 +86,9 @@ impl RsCRequest {
                 rss_response.body = String::new();}
         }
 
-        if self.is_success_log(rss_response.log.as_str()) {
-            rss_response.body = destination_path;
-        }
+        // if self.is_success_log(&rss_response.log) {
+        //     rss_response.body = destination_path;
+        // }
         rss_response
     }
 
@@ -99,14 +101,6 @@ impl RsCRequest {
     }
 
     
-    pub fn action_exists(&mut self, action:&str) -> bool {
-        matches!(action, AW_CV | AW_CRSF| AW_HTMLC 
-                | AW_LV | AW_PDFC | AW_RRSF| AW_CF
-                | AW_DF | AW_UV | AW_DRSF | AW_URSF 
-                | AW_UFN )
-    }
-
-
     pub fn http_response_code(&mut self, rs_log:String) -> String{
         let mut _http_code = String::new();
         if self.is_success_log(rs_log.as_str()) {
@@ -126,6 +120,8 @@ impl RsCRequest {
         is_success
     }
 
+
+    
 }
 
 

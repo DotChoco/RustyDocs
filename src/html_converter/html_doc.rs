@@ -21,11 +21,9 @@ impl HTMLDoc {
         // Leer el contenido del archivo
         match read_to_string(self.file_path.clone()) {
             Ok(content) => {
-
                 let lines:Vec<_> = content.lines().collect();
                 
                 for line in lines {
-                    // println!("{}",line);
                     self.get_flag(line);
                 }
                 self.html_struct();
@@ -121,9 +119,9 @@ impl HTMLDoc {
         }
         html_doc.push(L_CTEM.to_string());
         
-        for data in html_doc {
-            println!("{}", data)
-        }
+        // for data in html_doc {
+        //     println!("{}", data)
+        // }
     }
 
 }

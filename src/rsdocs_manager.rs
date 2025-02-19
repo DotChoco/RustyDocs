@@ -4,8 +4,7 @@ use crate::config_rsf::rsdocs_config::
     {RSDocsPaths, RsDocsConfig, DEFAULT_RELATIVE_PATH};
     
 use crate::doc_files::rusty_file::RustyFile;
-use crate::server_rsdocs::rs_server_cons::
-    {RsSErrorLogs, RsSSuccesLogs};
+use crate::logs::logs::{RsSErrorLogs, RsSSuccesLogs};
 
 
 #[derive(serde::Serialize)]
@@ -22,7 +21,7 @@ impl RsDocsManger {
 
 
     pub fn init(&mut self, vault_path:String)->bool{
-        if Path::new(vault_path.as_str()).exists() {
+        if Path::new(&vault_path).exists() {
             self.rs_conf.load_config_file(vault_path);
             return true;
         }
@@ -34,8 +33,8 @@ impl RsDocsManger {
         mut _folder_path:String, mut _name:String)->String{
         let path = format!("{}{}", vault,_folder_path);
         
-        if !Path::new(path.as_str()).exists() {
-            return RsSErrorLogs::SE03.as_ref().to_string();
+        if !Path::new(&path).exists() {
+            return RsSErrorLogs::BE03.as_ref().to_string();
         }
         println!("{}", path);
 
@@ -53,7 +52,7 @@ impl RsDocsManger {
 
         //File Creation
         rusty_file.create(_name.clone(),
-                    _relative_path.as_str(),
+                    &_relative_path,
                     self.rs_conf.get_vault_path(),
                         self.rs_conf.get_ids());
         
@@ -70,7 +69,7 @@ impl RsDocsManger {
         
         //Overwrite config file
         self.rs_conf.write_content();
-        return RsSSuccesLogs::S03.as_ref().to_string();
+        return RsSSuccesLogs::B03.as_ref().to_string();
     }
 
 
@@ -93,11 +92,11 @@ impl RsDocsManger {
         match fs::create_dir(path) {
             Ok(_) => {
                 println!("Carpeta creada exitosamente.");
-                return RsSSuccesLogs::S01.as_ref().to_string();
+                return RsSSuccesLogs::B01.as_ref().to_string();
             },
             Err(e) => {
                 eprintln!("Error al crear la carpeta: {}", e);
-                return RsSErrorLogs::SE02.as_ref().to_string();
+                return RsSErrorLogs::BE02.as_ref().to_string();
             },
         }
     }

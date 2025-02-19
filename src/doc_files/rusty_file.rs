@@ -83,7 +83,8 @@ impl RustyFile {
         let full_path = format!("{}{}{}", self.path, file_name, RSFILE_EXTENSION);
         let path = Path::new(full_path.as_str());
         
-        println!("{}", path.to_str().unwrap());
+        //Debug
+        // println!("{}", path.to_str().unwrap());
 
         //Check if the id actually exists
         let mut exist_id = false;
@@ -115,7 +116,8 @@ impl RustyFile {
 
         file.write_all(_file_content.as_bytes())?;
 
-        println!("Texto agregado. {}\n{}", path, full_path);
+        // Debug
+        // println!("Texto agregado. {}\n{}", path, full_path);
 
         Ok(())
     }
